@@ -17,7 +17,7 @@ Ensure you have the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/g
 
 > **Note** 
 > 
-> At the moment, neither of these implementations work.
+> At the moment, neither of these implementations spin up all the necessary services. Full PoC is still very much a WIP.
 
 **[Delta Lake:](./tf_delta_lake/)**
 
