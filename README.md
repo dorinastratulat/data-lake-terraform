@@ -16,6 +16,7 @@ This repository contains two (WIP) PoC implementations of a Data Lake on AWS usi
 Ensure you have the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) installed and configured with your AWS credentials.
 
 > **Note** 
+> 
 > At the moment, neither of these implementations work.
 
 **[Delta Lake:](./tf_delta_lake/)**
