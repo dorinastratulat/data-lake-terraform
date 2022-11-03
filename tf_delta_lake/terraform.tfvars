@@ -1,0 +1,6 @@
+dms_bucket_name     = "grh-dms-bucket"
+mssql_identifier    = "grh-mssql-sandbox"
+mssql_username      = "admin"
+mssql_password      = "ma1nus3r"
+mssql_secret_prefix = "grh_mssql_pass"
+network_name        = "grh_vpc_sandbox"

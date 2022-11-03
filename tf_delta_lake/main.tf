@@ -4,11 +4,39 @@ terraform {
     aws = {
       source = "hashicorp/aws"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.4.3"
+    }
   }
 }
 
 provider "aws" {
   region = "ca-central-1"
+}
+
+provider "random" {
+
+}
+
+module "network" {
+  source = "./modules/network"
+
+  name = var.network_name
+}
+
+# module "dms" {
+#   source          = "./modules/dms"
+#   dms_bucket_name = var.dms_bucket_name
+# }
+
+module "mssql" {
+  source     = "./modules/mssql"
+  identifier = var.mssql_identifier
+  username   = var.mssql_username
+  password   = var.mssql_password
+  # security_group_id = 
+  security_group_id = module.network.security_group.id
 }
 
 # resource "aws_db_instance" "grh_mssql" {
@@ -26,6 +54,6 @@ provider "aws" {
 #   # db_name             = "mydb"
 # }
 
-resource "aws_s3_bucket" "raw_bucket" {
-  bucket = "grh_raw_bucket_sandbox"
-}
+# resource "aws_s3_bucket" "raw_bucket" {
+#   bucket = "grh_raw_bucket_sandbox"
+# }
