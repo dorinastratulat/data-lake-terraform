@@ -44,3 +44,8 @@ variable "security_group_id" {
   description = "The security group id for the RDS instance"
   type        = string
 }
+
+variable "subnet_ids" {
+  description = "The subnet id for the RDS subnet group"
+  type        = set(string)
+}

@@ -37,6 +37,7 @@ module "mssql" {
   password   = var.mssql_password
   # security_group_id = 
   security_group_id = module.network.security_group.id
+  subnet_ids        = module.network.subnet_ids
 }
 
 # resource "aws_db_instance" "grh_mssql" {

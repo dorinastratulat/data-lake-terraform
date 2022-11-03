@@ -17,6 +17,16 @@ resource "aws_subnet" "public_subnet" {
   }
 }
 
+resource "aws_subnet" "public_subnet_2" {
+  vpc_id            = aws_vpc.main_vpc.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "ca-central-1b"
+
+  tags = {
+    Name = "${var.name}_public_subnet_2"
+  }
+}
+
 resource "aws_internet_gateway" "vpc_igw" {
   vpc_id = aws_vpc.main_vpc.id
 
@@ -40,6 +50,11 @@ resource "aws_route_table" "main_route_table" {
 
 resource "aws_route_table_association" "vpc_route_assoc" {
   subnet_id      = aws_subnet.public_subnet.id
+  route_table_id = aws_route_table.main_route_table.id
+}
+
+resource "aws_route_table_association" "vpc_route_assoc_3" {
+  subnet_id      = aws_subnet.public_subnet_2.id
   route_table_id = aws_route_table.main_route_table.id
 }
 
