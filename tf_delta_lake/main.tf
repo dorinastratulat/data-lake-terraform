@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/random"
       version = "3.4.3"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.0"
+    }
   }
 }
 
@@ -15,9 +19,8 @@ provider "aws" {
   region = "ca-central-1"
 }
 
-provider "random" {
-
-}
+provider "random" {}
+provider "null" {}
 
 module "network" {
   source = "./modules/network"
@@ -25,10 +28,11 @@ module "network" {
   name = var.network_name
 }
 
-# module "dms" {
-#   source          = "./modules/dms"
-#   dms_bucket_name = var.dms_bucket_name
-# }
+module "dms" {
+  source          = "./modules/dms"
+  dms_bucket_name = var.dms_bucket_name
+  base_name       = var.network_name
+}
 
 module "mssql" {
   source     = "./modules/mssql"

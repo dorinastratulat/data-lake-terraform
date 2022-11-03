@@ -1,5 +1,3 @@
-
-
 resource "random_id" "id" {
   byte_length = 8
 }
@@ -28,7 +26,7 @@ resource "aws_db_subnet_group" "mssql_subnet_group" {
 resource "aws_db_instance" "mssql" {
   allocated_storage    = var.allocated_storage
   storage_type         = var.storage_type
-  engine               = "sqlserver-ex"
+  engine               = "sqlserver-se"
   engine_version       = "15.00.4236.7.v1"
   instance_class       = var.instance_class
   identifier           = var.identifier
@@ -47,4 +45,23 @@ resource "aws_db_instance" "mssql" {
   # db_name             = "mydb"
 }
 
+resource "null_resource" "seed_db" {
+  depends_on = [
+    aws_db_instance.mssql
+  ]
 
+  # triggers = {
+  #   always_run = timestamp()
+  # }
+
+  provisioner "local-exec" {
+    command     = "./dbtool destroy && ./dbtool init && ./dbtool seed 5"
+    interpreter = ["bash", "-c"]
+
+    environment = {
+      SQL_ENDPOINT = aws_db_instance.mssql.endpoint
+    }
+  }
+
+
+}

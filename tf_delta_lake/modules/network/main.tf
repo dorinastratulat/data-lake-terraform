@@ -59,7 +59,7 @@ resource "aws_route_table_association" "vpc_route_assoc_3" {
 }
 
 resource "aws_security_group" "allow_all" {
-  name        = "allow_tls"
+  name        = "allow_mssql"
   description = "Allow TLS inbound traffic"
   vpc_id      = aws_vpc.main_vpc.id
 

@@ -1,0 +1,150 @@
+#!/bin/bash
+
+# create a variable called base_command and set it to sqlcmd
+
+init_command_0="create database test;"
+init_command_1="create schema test;"
+init_command_2="CREATE TABLE test.test (id int IDENTITY(1, 1) PRIMARY KEY, n numeric NOT NULL, ts datetime NOT NULL);"
+init_command_3="exec msdb.dbo.rds_cdc_enable_db 'test'"
+
+destroy_command="drop table if exists test.test; drop schema if exists test;"
+
+seed_command="insert into test.test (n, ts) values (0, cast(CURRENT_TIMESTAMP as datetime));"
+
+if [ -z "$SQL_ENDPOINT" ]
+then
+    endpoint="tcp:$(cat terraform.tfstate | jq -r '.outputs.mssql_module.value.endpoint' | sed -r 's/[:]/,/g')"
+else
+    endpoint="tcp:$(echo $SQL_ENDPOINT | sed -r 's/[:]/,/g')"
+fi
+
+echo $endpoint
+
+base_command="docker run --rm mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $endpoint -U admin -P ma1nus3r -d test -Q"
+base_no_db="docker run --rm mcr.microsoft.com/mssql-tools /opt/mssql-tools/bin/sqlcmd -S $endpoint -U admin -P ma1nus3r -Q"
+
+case $1 in
+    "init")
+        echo "Initializing database"
+        run_command="$base_no_db '$init_command_0'"
+        echo $run_command
+        eval $run_command
+        run_command="$base_command '$init_command_1'"
+        echo $run_command
+        eval $run_command
+        run_command="$base_command '$init_command_2'"
+        echo $run_command
+        eval $run_command
+        run_command="$base_command '$init_command_3'"
+        echo $run_command
+        eval $run_command
+    ;;
+    "destroy")
+        echo "Destroying database"
+        run_command="$base_command 'drop table if exists test.test; drop schema if exists test;'"
+        echo $run_command
+        eval $run_command
+        run_command="$base_no_db 'drop database if exists test;'"
+        echo $run_command
+        eval $run_command
+    ;;
+    "seed")
+        echo "Creating database"
+        run_command="$base_command '$seed_command'"
+        # echo $run_command
+        for (( c=0; c<$2; c++ ))
+        do
+            eval $run_command
+        done
+    ;;
+    "add")
+        echo "Adding new row"
+        run_command="$base_command 'insert into test.test (n, ts) values (0, cast(CURRENT_TIMESTAMP as datetime));'"
+        echo $run_command
+        eval $run_command
+    ;;
+    "show")
+        echo "Showing database"
+        run_command="$base_command 'select '*' from test.test;'"
+        echo $run_command
+        eval $run_command
+    ;;
+    "incr")
+        case $2 in
+            "first")
+                echo "Incrementing first record"
+                run_command="$base_command 'update test.test set n = n + 1 where id = (select min(id) from test.test);'"
+                echo $run_command
+                eval $run_command
+            ;;
+            "last")
+                echo "Incrementing last record"
+                run_command="$base_command 'update test.test set n = n + 1 where id = (select max(id) from test.test);'"
+                echo $run_command
+                eval $run_command
+            ;;
+            "id")
+                echo "Incrementing record with id $3"
+                run_command="$base_command 'update test.test set n = n + 1 where id = $3;'"
+                echo $run_command
+                eval $run_command
+            ;;
+            *)
+                echo "Unknown command"
+            ;;
+        esac
+    ;;
+    "decr")
+        case $2 in
+            "first")
+                echo "Decrementing first record"
+                run_command="$base_command 'update test.test set n = n - 1 where id = (select min(id) from test.test);'"
+                echo $run_command
+                eval $run_command
+            ;;
+            "last")
+                echo "Decrementing last record"
+                run_command="$base_command 'update test.test set n = n - 1 where id = (select max(id) from test.test);'"
+                echo $run_command
+                eval $run_command
+            ;;
+            "id")
+                echo "Decrementing record with id $3"
+                run_command="$base_command 'update test.test set n = n - 1 where id = $3;'"
+                echo $run_command
+                eval $run_command
+            ;;
+            *)
+                echo "Unknown command"
+            ;;
+        esac
+    ;;
+    "del")
+        case $2 in
+            "first")
+                echo "Deleting first record"
+                run_command="$base_command 'delete from test.test where id = (select min(id) from test.test);'"
+                echo $run_command
+                eval $run_command
+            ;;
+            "last")
+                echo "Decrementing last record"
+                run_command="$base_command 'delete from test.test where id = (select max(id) from test.test);'"
+                echo $run_command
+                eval $run_command
+            ;;
+            "id")
+                echo "Decrementing record with id $3"
+                run_command="$base_command 'delete from test.test where id = $3;'"
+                echo $run_command
+                eval $run_command
+            ;;
+            *)
+                echo "Unknown command"
+            ;;
+        esac
+    ;;
+    *)
+        echo "Unknown command"
+    ;;
+esac

@@ -13,7 +13,8 @@ variable "storage_type" {
 variable "instance_class" {
   description = "The instance type of the RDS instance"
   type        = string
-  default     = "db.t3.small"
+  default     = "db.m5.large"
+  # default     = "db.t3.small"
 }
 
 variable "identifier" {
