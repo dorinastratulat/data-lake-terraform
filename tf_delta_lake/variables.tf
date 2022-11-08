@@ -20,3 +20,7 @@ variable "mssql_secret_prefix" {
 variable "network_name" {
   type = string
 }
+
+variable "base_name" {
+  type = string
+}

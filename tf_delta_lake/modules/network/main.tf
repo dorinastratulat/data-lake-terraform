@@ -48,14 +48,27 @@ resource "aws_route_table" "main_route_table" {
   }
 }
 
+resource "aws_route_table" "main_route_table_2" {
+  vpc_id = aws_vpc.main_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.vpc_igw.id
+  }
+
+  tags = {
+    Name = "${var.name}_public_subnet_route_table_2"
+  }
+}
+
 resource "aws_route_table_association" "vpc_route_assoc" {
   subnet_id      = aws_subnet.public_subnet.id
   route_table_id = aws_route_table.main_route_table.id
 }
 
-resource "aws_route_table_association" "vpc_route_assoc_3" {
+resource "aws_route_table_association" "vpc_route_assoc_2" {
   subnet_id      = aws_subnet.public_subnet_2.id
-  route_table_id = aws_route_table.main_route_table.id
+  route_table_id = aws_route_table.main_route_table_2.id
 }
 
 resource "aws_security_group" "allow_all" {
@@ -64,10 +77,10 @@ resource "aws_security_group" "allow_all" {
   vpc_id      = aws_vpc.main_vpc.id
 
   ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main_vpc.cidr_block, "0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {

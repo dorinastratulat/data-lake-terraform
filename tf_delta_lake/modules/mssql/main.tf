@@ -14,6 +14,7 @@ resource "aws_secretsmanager_secret_version" "mssql_pass_val" {
       password = aws_db_instance.mssql.password
       host     = aws_db_instance.mssql.endpoint
       engine   = "sqlserver"
+      port     = 1433
     }
   )
 }

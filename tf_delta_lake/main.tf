@@ -28,11 +28,6 @@ module "network" {
   name = var.network_name
 }
 
-module "dms" {
-  source          = "./modules/dms"
-  dms_bucket_name = var.dms_bucket_name
-  base_name       = var.network_name
-}
 
 module "mssql" {
   source     = "./modules/mssql"
@@ -42,6 +37,16 @@ module "mssql" {
   # security_group_id = 
   security_group_id = module.network.security_group.id
   subnet_ids        = module.network.subnet_ids
+}
+
+module "dms" {
+  source            = "./modules/dms"
+  dms_bucket_name   = var.dms_bucket_name
+  base_name         = var.base_name
+  vpc_id            = module.network.vpc_id
+  subnet_ids        = module.network.subnet_ids
+  db_secrets_arn    = module.mssql.pass_arn
+  security_group_id = module.network.security_group.id
 }
 
 # resource "aws_db_instance" "grh_mssql" {
