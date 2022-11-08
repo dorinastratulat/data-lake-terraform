@@ -109,7 +109,7 @@ class LakeJob:
         """Load CDC data from path"""
 
         cdc_path = os.path.join(self.rz_path, self.table_name, "updates")
-        df: DataFrame = self._glue_context.create_dynamic_frame.from_options(
+        df = self._glue_context.create_dynamic_frame.from_options(
             connection_type="s3",
             connection_options={
                 "paths": [cdc_path],
